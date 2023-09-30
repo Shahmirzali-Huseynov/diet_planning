@@ -5,14 +5,24 @@ import random
 from models import Meal, NutrientValues, DayMenu, WeeklyMenu
 
 
-def get_diet_menu():
+def get_diet_menu(user_age: int, user_gender: str, week: int):
     df1 = pd.read_csv("assets/set1.csv")
     df2 = pd.read_csv("assets/set2.csv")
 
     df1_indexed = df1.set_index("ID")
 
-    age = 20
-    gender = "Kadın"
+    # age = 64
+    # gender = "Kadın"
+
+    def parse_age_group(age_group):
+        lower, upper = map(int, age_group.split("-"))
+        return range(lower, upper + 1)  # üst sınıra 1 ekliyoruz
+
+
+    limits = df2[
+        (df2["Cinsiyet"] == user_gender)
+        & (df2["Yaş Grubu"].apply(lambda x: user_age in parse_age_group(x)))
+    ].iloc[0]
 
     def find_mandatory_dish_id(df, used_dishes):
         for dish_name in mandatory_dish_names:
@@ -22,11 +32,6 @@ def get_diet_menu():
                 if dish_id not in used_dishes:
                     return dish_id, dish_name
         return None, None
-
-    limits = df2[
-        (df2["Cinsiyet"] == gender)
-        & (df2["Yaş Grubu"].apply(lambda x: age in range(*map(int, x.split("-")))))
-    ].iloc[0]
 
     all_mandatory_dish_names = [
         "Etli Nohut",
@@ -142,12 +147,12 @@ def get_diet_menu():
 
     weekly_menus = []
 
-    for week in range(1, 5):
+    for week in range(1, week + 1):
         # print(f"{week}. Hafta Menüleri\n")
         mandatory_dish_day = random.choice(range(1, 6))
         mandatory_dish_id, mandatory_dish_name = None, None
 
-        weekly_menu = WeeklyMenu(Hafta=week, Menuler=[]) 
+        weekly_menu = WeeklyMenu(week=week, menus=[]) 
 
         for day in range(1, 6):
             prob = pl.LpProblem(f"Menu_Optimization_{week}_{day}", pl.LpMinimize)
@@ -294,23 +299,23 @@ def get_diet_menu():
             #     print(f"{nutrient}: {value}")
             selected_dishes = [i for i in available_dishes if dish_vars[i].value() == 1]
             day_menu_meals = [Meal(
-                ID=int(i),
-                Yemek=df1_indexed.loc[i]["Yiyecek adı"],
-                Fiyat=df1_indexed.loc[i]["Fiyat"],
-                Renk=df1_indexed.loc[i]["Renk"],
-                Kivam=df1_indexed.loc[i]["Kıvam"]
+                id=int(i),
+                food=df1_indexed.loc[i]["Yiyecek adı"],
+                price=df1_indexed.loc[i]["Fiyat"],
+                color=df1_indexed.loc[i]["Renk"],
+                consistency=df1_indexed.loc[i]["Kıvam"]
             ) for i in selected_dishes]
             
             total_nutrient_values = NutrientValues(
-                Enerji=sum(df1_indexed.loc[i]["Enerji"] for i in selected_dishes),
-                Karbonhidrat=sum(df1_indexed.loc[i]["Karbonhidrat"] for i in selected_dishes),
-                Protein=sum(df1_indexed.loc[i]["Protein"] for i in selected_dishes),
-                Yağ=sum(df1_indexed.loc[i]["Yağ"] for i in selected_dishes),
-                Lif=sum(df1_indexed.loc[i]["Lif"] for i in selected_dishes)
+                energy=sum(df1_indexed.loc[i]["Enerji"] for i in selected_dishes),
+                carbohydrate=sum(df1_indexed.loc[i]["Karbonhidrat"] for i in selected_dishes),
+                protein=sum(df1_indexed.loc[i]["Protein"] for i in selected_dishes),
+                fat=sum(df1_indexed.loc[i]["Yağ"] for i in selected_dishes),
+                fiber=sum(df1_indexed.loc[i]["Lif"] for i in selected_dishes)
             )
             
-            day_menu = DayMenu(Status="Optimal", Day= day, Gun_Menu=day_menu_meals, Toplam_Besin_Degerleri=total_nutrient_values)
-            weekly_menu.Menuler.append(day_menu)
+            day_menu = DayMenu(status="Optimal", day = day, menu=day_menu_meals, total_nutrient_values=total_nutrient_values)
+            weekly_menu.menus.append(day_menu)
 
         weekly_menus.append(weekly_menu)
 

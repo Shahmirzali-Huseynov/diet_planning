@@ -29,9 +29,13 @@ async def root():
     
 
 @app.get("/get_data_from_csv", response_model=List[WeeklyMenu])
-def get_data_from_csv():
+def get_data_from_csv(user_age: int, user_gender: str, week: int):
     # user_age: int, user_gender: str, week: int
-    data = diet_planning.get_diet_menu()
+    data = diet_planning.get_diet_menu(
+        user_age= user_age,
+        user_gender=user_gender,
+        week=week
+    )
     if not isinstance(data, list):
         return {"error": "Invalid data format. Expected a list of dictionaries."}
     return data

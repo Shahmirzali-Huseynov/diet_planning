@@ -2,25 +2,25 @@ from pydantic import BaseModel
 from typing import List, Dict
 
 class Meal(BaseModel):
-    ID: int
-    Yemek: str
-    Fiyat: str
-    Renk: str
-    Kivam: str
+    id: int
+    food: str
+    price: str
+    color: str
+    consistency: str
 
 class NutrientValues(BaseModel):
-    Enerji: float
-    Karbonhidrat: float
-    Protein: float
-    Yağ: float
-    Lif: float
+    energy: float
+    carbohydrate: float
+    protein: float
+    fat: float
+    fiber: float
 
 class DayMenu(BaseModel):
-    Status: str
-    Day: int
-    Gun_Menu: List[Meal]
-    Toplam_Besin_Degerleri: NutrientValues
+    status: str
+    day: int
+    menu: List[Meal]
+    total_nutrient_values: NutrientValues
 
 class WeeklyMenu(BaseModel):
-    Hafta: int
-    Menuler: List[DayMenu]
+    week: int
+    menus: List[DayMenu]
