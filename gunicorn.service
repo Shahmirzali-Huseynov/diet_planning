@@ -1,0 +1,14 @@
+[Unit]
+Description=diet planning fastapi application
+After=network.target
+
+[Service]
+User=mirza
+Group=mirza
+WorkingDirectory=/home/mirza/app/src
+Environment="PATH=/home/mirza/app/venv/bin"
+EnvironmentFile=/home/mirza/.env
+ExecStart=/home/mirza/app/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target
