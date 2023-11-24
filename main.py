@@ -4,10 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List 
 from models import WeeklyMenu
 
-import requests
-import google.auth.transport.requests
 
-from google.oauth2 import service_account
 from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 
@@ -36,7 +33,7 @@ app.add_middleware(
 # pip install requests
 @app.get("/")
 async def root():
-    return {"message": f"Hello {get_access_token()}"}
+    return {"message": f"Hello Shahmirzali"}
 
 @app.get("/app")
 async def deep_link():
@@ -123,24 +120,26 @@ def get_data_from_csv(user_age: int, user_gender: str, week: int):
 
 
 # -----------------------------------------------------------
+# @app.get("/")
+# async def root():
+#     return {"message": f"Hello {get_access_token()}"}
 
+# import google.auth.transport.requests
 
-import google.auth.transport.requests
+# from google.oauth2 import service_account
 
-from google.oauth2 import service_account
+# SCOPES = ['https://www.googleapis.com/auth/firebase.messaging']
 
-SCOPES = ['https://www.googleapis.com/auth/firebase.messaging']
+# def get_access_token():
+#   """Retrieve a valid access token that can be used to authorize requests.
 
-def get_access_token():
-  """Retrieve a valid access token that can be used to authorize requests.
-
-  :return: Access token.
-  """
-  credentials = service_account.Credentials.from_service_account_file(
-    'ondan-service.json', scopes=SCOPES)
-  request = google.auth.transport.requests.Request()
-  credentials.refresh(request)
-  return credentials.token
+#   :return: Access token.
+#   """
+#   credentials = service_account.Credentials.from_service_account_file(
+#     'ondan-service.json', scopes=SCOPES)
+#   request = google.auth.transport.requests.Request()
+#   credentials.refresh(request)
+#   return credentials.token
 
 # @app.get("/get_data_from_csv",response_model=models.WeeklyMenu)
 # def get_data_from_csv(user_age: int, user_gender: str):
