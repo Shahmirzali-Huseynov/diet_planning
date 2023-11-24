@@ -6,7 +6,8 @@ from models import WeeklyMenu
 
 
 from fastapi.responses import HTMLResponse
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse
+import os
 
 app = FastAPI()
 
@@ -64,17 +65,13 @@ async def deep_link():
     return HTMLResponse(content=html_content)
 
 @app.get("/.well-known/apple-app-site-association")
-async def read_apple_app_site_association():
-    return JSONResponse(content= {
-        "applinks": {
-            "details": [
-                {
-                    "appID": "8CF5H9AVNS.com.technosphere.ondanapp",
-                    "paths": [ "/app/*" ]
-                }
-            ]
-        }
-    }, status_code=200)
+async def apple_app_site_association():
+    # Projeye göre düzenlenmiş yolu tanımlayın
+    aasa_file_path = os.path.join(
+        os.path.dirname(__file__),  # Bu dosyanın bulunduğu dizin
+        '.well-known', 'apple-app-site-association'  # `.well-known` altındaki dosya
+    )
+    return FileResponse(aasa_file_path, media_type='application/json', headers={"Content-Type": "application/json; charset=utf-8"})
     
 # <!DOCTYPE html>
 # <html>
