@@ -3,6 +3,14 @@ import diet_planning
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List 
 from models import WeeklyMenu
+
+import requests
+import google.auth.transport.requests
+
+from google.oauth2 import service_account
+from fastapi.responses import HTMLResponse
+from fastapi.responses import JSONResponse
+
 app = FastAPI()
 
 # ["*"],
@@ -22,11 +30,79 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# pip install google-auth
+# pip install google-auth-httplib2
+# pip install google-auth-oauthlib
+# pip install requests
 @app.get("/")
 async def root():
-    return {"message": "Hello World from Shahmirzali!"}
+    return {"message": f"Hello {get_access_token()}"}
+
+@app.get("/app")
+async def deep_link():
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Your Website Title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript">
+            window.onload = function() {
+                var isAndroid = /android/i.test(navigator.userAgent);
+                var isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                if (isAndroid) {
+                    window.location.href = 'https://play.google.com/store/apps/details?id=com.google.android.youtube';
+                } else if (isiOS) {
+                    window.location.href = 'https://apps.apple.com/app/youtube-watch-listen-stream/id544007664';
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <h1>AppLink Test</h1>
+        <p>This is an example of a website that redirects users to the YouTube app's page on the App Store or Play Store, depending on their device.</p>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
+
+@app.get("/.well-known/apple-app-site-association")
+async def read_apple_app_site_association():
+    return JSONResponse(content= {
+        "applinks": {
+            "details": [
+                {
+                    "appID": "8CF5H9AVNS.com.technosphere.ondanapp",
+                    "paths": [ "/app/*" ]
+                }
+            ]
+        }
+    }, status_code=200)
     
+# <!DOCTYPE html>
+# <html>
+# <head>
+#     <title>Your Website Title</title>
+#     <meta name="viewport" content="width=device-width, initial-scale=1">
+#     <script type="text/javascript">
+#         window.onload = function() {
+#             var isAndroid = /android/i.test(navigator.userAgent);
+#             var isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+#             if (isAndroid) {
+#                 // Redirect to the Play Store
+#                 window.location.href = 'https://play.google.com/store/apps/details?id=com.google.android.youtube';
+#             } else if (isiOS) {
+#                 // Redirect to the App Store
+#                 window.location.href = 'https://apps.apple.com/app/youtube-watch-listen-stream/id544007664';
+#             }
+#         }
+#     </script>
+# </head>
+# <body>
+#     <h1>AppLink Test</h1>
+#     <p>This is an example of a website that redirects users to the YouTube app's page on the App Store or Play Store, depending on their device.</p>
+# </body>
+# </html>
 
 @app.get("/get_data_from_csv", response_model=List[WeeklyMenu])
 def get_data_from_csv(user_age: int, user_gender: str, week: int):
@@ -43,6 +119,28 @@ def get_data_from_csv(user_age: int, user_gender: str, week: int):
 
 
 
+
+
+
+# -----------------------------------------------------------
+
+
+import google.auth.transport.requests
+
+from google.oauth2 import service_account
+
+SCOPES = ['https://www.googleapis.com/auth/firebase.messaging']
+
+def get_access_token():
+  """Retrieve a valid access token that can be used to authorize requests.
+
+  :return: Access token.
+  """
+  credentials = service_account.Credentials.from_service_account_file(
+    'ondan-service.json', scopes=SCOPES)
+  request = google.auth.transport.requests.Request()
+  credentials.refresh(request)
+  return credentials.token
 
 # @app.get("/get_data_from_csv",response_model=models.WeeklyMenu)
 # def get_data_from_csv(user_age: int, user_gender: str):
