@@ -72,6 +72,15 @@ async def apple_app_site_association():
         '.well-known', 'apple-app-site-association'  # `.well-known` altındaki dosya
     )
     return FileResponse(aasa_file_path, media_type='application/json', headers={"Content-Type": "application/json; charset=utf-8"})
+
+@app.get("/.well-known/assetlinks.json")
+async def android_assetlinks_json():
+    # Projeye göre düzenlenmiş yolu tanımlayın
+    aasa_file_path = os.path.join(
+        os.path.dirname(__file__),  # Bu dosyanın bulunduğu dizin
+        '.well-known', 'assetlinks.json'  # `.well-known` altındaki dosya
+    )
+    return FileResponse(aasa_file_path, media_type='application/json', headers={"Content-Type": "application/json; charset=utf-8"})
     
 # <!DOCTYPE html>
 # <html>

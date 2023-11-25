@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.technosphere.ondanapp",
+    "sha256_cert_fingerprints":
+    ["b6:33:20:64:2b:7e:8c:81:a7:46:da:a6:0b:68:5a:f5:84:73:cc:8a:6a:bb:e4:d0:2a:61:5a:19:d7:76:68:51"]
+  }
+}]
