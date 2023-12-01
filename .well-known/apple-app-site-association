@@ -3,7 +3,10 @@
         "details": [
             {
                 "appID": "8CF5H9AVNS.com.technosphere.ondanapp",
-                "paths": [ "/app/*" ]
+                "paths": [
+                    "/app/*",
+                    "/app/product_detail/*"
+                ]
             }
         ]
     }
